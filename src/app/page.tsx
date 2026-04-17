@@ -18,13 +18,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-// ✅ IMPORT DATA
 import { holdings } from "@/data/holdings";
 import { preHarvest, afterHarvest } from "@/data/summary";
 import { disclaimer } from "@/data/disclaimer";
 
 export default function Home() {
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [data, setData] = useState(holdings);
 
   const toggleRow = (index: number) => {
     setSelectedRows((prev) =>
@@ -32,6 +33,19 @@ export default function Home() {
         ? prev.filter((i) => i !== index)
         : [...prev, index]
     );
+  };
+
+  const handleSort = () => {
+    const newOrder = sortOrder === "asc" ? "desc" : "asc";
+    setSortOrder(newOrder);
+
+    const sorted = [...data].sort((a, b) =>
+      newOrder === "asc"
+        ? a.shortNum - b.shortNum
+        : b.shortNum - a.shortNum
+    );
+
+    setData(sorted);
   };
 
   return (
@@ -71,9 +85,8 @@ export default function Home() {
         </AccordionItem>
       </Accordion>
 
-      {/* Cards */}
+      {/* Cards (unchanged) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
         {/* PRE HARVEST */}
         <Card className="rounded-2xl shadow-sm">
           <CardContent className="p-6">
@@ -168,7 +181,6 @@ export default function Home() {
             </div>
           </CardContent>
         </Card>
-
       </div>
 
       {/* TABLE */}
@@ -185,14 +197,25 @@ export default function Home() {
               <span>Asset</span>
               <span>Holdings</span>
               <span>Total Current Value</span>
-              <span>Short-term</span>
+
+              {/* SORT COLUMN */}
+              <span
+                onClick={handleSort}
+                className="cursor-pointer flex items-center gap-1"
+              >
+                Short-term
+                <span className="text-xs">
+                  {sortOrder === "asc" ? "↑" : "↓"}
+                </span>
+              </span>
+
               <span>Long-term</span>
               <span className="text-right">Amount to Sell</span>
             </div>
 
             {/* Scrollable */}
             <div className="mt-2 max-h-64 overflow-y-auto space-y-1 pr-1">
-              {holdings.map((coin, i) => {
+              {data.map((coin, i) => {
                 const isSelected = selectedRows.includes(i);
 
                 return (
@@ -202,6 +225,7 @@ export default function Home() {
                     className={`grid grid-cols-6 px-4 py-3 rounded-lg cursor-pointer ${isSelected ? "bg-blue-100" : "hover:bg-gray-50"
                       }`}
                   >
+                    {/* Asset */}
                     <div className="flex items-center gap-2">
                       <Checkbox
                         checked={isSelected}
@@ -216,27 +240,56 @@ export default function Home() {
                     </div>
 
                     <span>{coin.quantity}</span>
+
+                    {/* VALUE TOOLTIP */}
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <span className="cursor-pointer font-medium">
                           {coin.value}
                         </span>
                       </TooltipTrigger>
-
-                      <TooltipContent
-                        side="top"
-                        className="bg-white text-black text-sm px-3 py-1 rounded-md shadow-md"
-                      >
+                      <TooltipContent className="bg-white text-black px-3 py-1 rounded shadow">
                         {coin.value}
                       </TooltipContent>
                     </Tooltip>
-                    <span className={coin.short.includes("-") ? "text-red-500" : "text-green-500"}>
-                      {coin.short}
+
+                    {/* SHORT TOOLTIP */}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span
+                          className={`cursor-pointer ${coin.shortNum < 0
+                            ? "text-red-500"
+                            : "text-green-500"
+                            }`}
+                        >
+                          {coin.short}
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-white text-black px-3 py-1 rounded shadow">
+                        {coin.short}
+                      </TooltipContent>
+                    </Tooltip>
+
+                    {/* LONG TOOLTIP */}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span
+                          className={`cursor-pointer ${coin.longNum < 0
+                            ? "text-red-500"
+                            : "text-green-500"
+                            }`}
+                        >
+                          {coin.long}
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-white text-black px-3 py-1 rounded shadow">
+                        {coin.long}
+                      </TooltipContent>
+                    </Tooltip>
+
+                    <span className="text-right">
+                      {isSelected ? coin.quantity : "-"}
                     </span>
-                    <span className={coin.long.includes("-") ? "text-red-500" : "text-green-500"}>
-                      {coin.long}
-                    </span>
-                    <span className="text-right">{isSelected ? coin.quantity : "-"}</span>
                   </div>
                 );
               })}
