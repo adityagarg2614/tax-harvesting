@@ -295,6 +295,10 @@ export default function Home() {
               })}
             </div>
 
+            <div className="mt-3 text-blue-600 text-sm cursor-pointer hover:underline">
+              View all
+            </div>
+
           </div>
         </CardContent>
       </Card>
