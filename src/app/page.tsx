@@ -1,0 +1,163 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Info } from "lucide-react";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
+// ✅ IMPORT DATA
+import { holdings } from "@/data/holdings";
+import { preHarvest, afterHarvest } from "@/data/summary";
+import { disclaimer } from "@/data/disclaimer";
+
+export default function Home() {
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
+
+  const toggleRow = (index: number) => {
+    setSelectedRows((prev) =>
+      prev.includes(index)
+        ? prev.filter((i) => i !== index)
+        : [...prev, index]
+    );
+  };
+
+  return (
+    <main className="p-6 bg-gray-100 min-h-screen space-y-6">
+
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <h1 className="text-2xl font-semibold">Tax Harvesting</h1>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="text-blue-600 underline cursor-pointer text-sm hover:text-blue-800">
+              How it works?
+            </span>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-xs text-sm">
+            Tax loss harvesting helps reduce taxable gains.
+          </TooltipContent>
+        </Tooltip>
+      </div>
+
+      {/* Accordion */}
+      <Accordion type="single" collapsible>
+        <AccordionItem className="border rounded-lg bg-blue-50 px-4 data-[state=open]:border-blue-400" value="item-1">
+          <AccordionTrigger className="hover:no-underline">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <Info className="w-4 h-4" />
+              Important Notes & Disclaimers
+            </div>
+          </AccordionTrigger>
+
+          <AccordionContent className="text-sm text-gray-700 space-y-2 pb-4">
+            {disclaimer.map((item, i) => (
+              <p key={i}>• {item}</p>
+            ))}
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
+      {/* Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <Card>
+          <CardContent className="p-6 space-y-4">
+            <h2 className="font-semibold">Pre Harvesting</h2>
+            <div className="flex justify-between"><span>Profits</span><span>{preHarvest.profits}</span></div>
+            <div className="flex justify-between"><span>Losses</span><span>{preHarvest.losses}</span></div>
+            <div className="flex justify-between font-medium"><span>Net</span><span>{preHarvest.net}</span></div>
+            <div className="pt-4 font-bold text-lg">Realised: {preHarvest.realized}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-linear-to-r from-blue-500 to-blue-600 text-white">
+          <CardContent className="p-6 space-y-4">
+            <h2 className="font-semibold">After Harvesting</h2>
+            <div className="flex justify-between"><span>Profits</span><span>{afterHarvest.profits}</span></div>
+            <div className="flex justify-between"><span>Losses</span><span>{afterHarvest.losses}</span></div>
+            <div className="flex justify-between font-medium"><span>Net</span><span>{afterHarvest.net}</span></div>
+            <div className="pt-4 font-bold text-lg">Effective: {afterHarvest.effective}</div>
+            <div>🎉 Save upto {afterHarvest.saved}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* TABLE */}
+      <Card>
+        <CardContent className="p-0">
+          <div className="p-6 pb-2">
+            <h2 className="font-semibold text-lg">Holdings</h2>
+          </div>
+
+          <div className="px-4 pb-4">
+
+            {/* Header */}
+            <div className="grid grid-cols-6 bg-gray-100 rounded-lg px-4 py-3 text-sm font-medium">
+              <span>Asset</span>
+              <span>Holdings</span>
+              <span>Value</span>
+              <span>Short</span>
+              <span>Long</span>
+              <span className="text-right">Sell</span>
+            </div>
+
+            {/* Scrollable */}
+            <div className="mt-2 max-h-64 overflow-y-auto space-y-1 pr-1">
+              {holdings.map((coin, i) => {
+                const isSelected = selectedRows.includes(i);
+
+                return (
+                  <div
+                    key={i}
+                    onClick={() => toggleRow(i)}
+                    className={`grid grid-cols-6 px-4 py-3 rounded-lg cursor-pointer ${isSelected ? "bg-blue-100" : "hover:bg-gray-50"
+                      }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => toggleRow(i)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <span>{coin.icon}</span>
+                      <div>
+                        <p>{coin.name}</p>
+                        <p className="text-xs text-gray-500">{coin.symbol}</p>
+                      </div>
+                    </div>
+
+                    <span>{coin.quantity}</span>
+                    <span>{coin.value}</span>
+                    <span className={coin.short.includes("-") ? "text-red-500" : "text-green-500"}>
+                      {coin.short}
+                    </span>
+                    <span className={coin.long.includes("-") ? "text-red-500" : "text-green-500"}>
+                      {coin.long}
+                    </span>
+                    <span className="text-right">{isSelected ? coin.quantity : "-"}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+          </div>
+        </CardContent>
+      </Card>
+
+    </main>
+  );
+}
