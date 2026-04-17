@@ -74,26 +74,101 @@ export default function Home() {
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        <Card>
-          <CardContent className="p-6 space-y-4">
-            <h2 className="font-semibold">Pre Harvesting</h2>
-            <div className="flex justify-between"><span>Profits</span><span>{preHarvest.profits}</span></div>
-            <div className="flex justify-between"><span>Losses</span><span>{preHarvest.losses}</span></div>
-            <div className="flex justify-between font-medium"><span>Net</span><span>{preHarvest.net}</span></div>
-            <div className="pt-4 font-bold text-lg">Realised: {preHarvest.realized}</div>
+        {/* PRE HARVEST */}
+        <Card className="rounded-2xl shadow-sm">
+          <CardContent className="p-6">
+            <h2 className="font-semibold text-lg mb-4">Pre Harvesting</h2>
+
+            {/* Header Row */}
+            <div className="grid grid-cols-3 text-sm font-medium text-gray-500 mb-2">
+              <span></span>
+              <span className="text-right">Short-term</span>
+              <span className="text-right">Long-term</span>
+            </div>
+
+            {/* Rows */}
+            <div className="space-y-2 text-sm">
+
+              <div className="grid grid-cols-3">
+                <span>Profits</span>
+                <span className="text-right">$1,540</span>
+                <span className="text-right">$1,200</span>
+              </div>
+
+              <div className="grid grid-cols-3">
+                <span>Losses</span>
+                <span className="text-right" >-$743</span>
+                <span className="text-right">-$650</span>
+              </div>
+
+              <div className="grid grid-cols-3 font-medium">
+                <span >Net Capital Gains</span>
+                <span className="text-right">$787</span>
+                <span className="text-right">$550</span>
+              </div>
+
+            </div>
+
+            {/* Bottom */}
+            <div className="mt-6 flex justify-between items-center">
+              <span className="text-base font-medium">
+                Realised Capital Gains:
+              </span>
+              <span className="text-2xl font-bold">$1,337</span>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-linear-to-r from-blue-500 to-blue-600 text-white">
-          <CardContent className="p-6 space-y-4">
-            <h2 className="font-semibold">After Harvesting</h2>
-            <div className="flex justify-between"><span>Profits</span><span>{afterHarvest.profits}</span></div>
-            <div className="flex justify-between"><span>Losses</span><span>{afterHarvest.losses}</span></div>
-            <div className="flex justify-between font-medium"><span>Net</span><span>{afterHarvest.net}</span></div>
-            <div className="pt-4 font-bold text-lg">Effective: {afterHarvest.effective}</div>
-            <div>🎉 Save upto {afterHarvest.saved}</div>
+
+        {/* AFTER HARVEST */}
+        <Card className="rounded-2xl shadow-sm bg-linear-to-r from-blue-500 to-blue-600 text-white">
+          <CardContent className="p-6">
+            <h2 className="font-semibold text-lg mb-4">After Harvesting</h2>
+
+            {/* Header Row */}
+            <div className="grid grid-cols-3 text-sm font-medium opacity-80 mb-2">
+              <span></span>
+              <span className="text-right">Short-term</span>
+              <span className="text-right">Long-term</span>
+            </div>
+
+            {/* Rows */}
+            <div className="space-y-2 text-sm">
+
+              <div className="grid grid-cols-3">
+                <span>Profits</span>
+                <span className="text-right">$1,540</span>
+                <span className="text-right">$1,200</span>
+              </div>
+
+              <div className="grid grid-cols-3">
+                <span>Losses</span>
+                <span className="text-right">-$2,343</span>
+                <span className="text-right">-$3,650</span>
+              </div>
+
+              <div className="grid grid-cols-3 font-medium">
+                <span>Net Capital Gains</span>
+                <span className="text-right">-$987</span>
+                <span className="text-right">-$2,450</span>
+              </div>
+
+            </div>
+
+            {/* Bottom */}
+            <div className="mt-6">
+              <div className="flex justify-between items-center text-lg font-semibold">
+                <span>Effective Capital Gains:</span>
+                <span>- $2,353</span>
+              </div>
+
+              <div className="mt-3 text-sm">
+                🎉 You are going to save upto <span className="font-semibold">$862</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
+
       </div>
 
       {/* TABLE */}
@@ -109,10 +184,10 @@ export default function Home() {
             <div className="grid grid-cols-6 bg-gray-100 rounded-lg px-4 py-3 text-sm font-medium">
               <span>Asset</span>
               <span>Holdings</span>
-              <span>Value</span>
-              <span>Short</span>
-              <span>Long</span>
-              <span className="text-right">Sell</span>
+              <span>Total Current Value</span>
+              <span>Short-term</span>
+              <span>Long-term</span>
+              <span className="text-right">Amount to Sell</span>
             </div>
 
             {/* Scrollable */}
@@ -141,7 +216,20 @@ export default function Home() {
                     </div>
 
                     <span>{coin.quantity}</span>
-                    <span>{coin.value}</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="cursor-pointer font-medium">
+                          {coin.value}
+                        </span>
+                      </TooltipTrigger>
+
+                      <TooltipContent
+                        side="top"
+                        className="bg-white text-black text-sm px-3 py-1 rounded-md shadow-md"
+                      >
+                        {coin.value}
+                      </TooltipContent>
+                    </Tooltip>
                     <span className={coin.short.includes("-") ? "text-red-500" : "text-green-500"}>
                       {coin.short}
                     </span>
